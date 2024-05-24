@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	api_call, err := setup.LoadApiCallFromFile("./queries/query.json")
+	mappings, err := setup.LoadApiCallFromFile("./mappings/query.json")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -18,7 +18,7 @@ func main() {
 		Getter: apicall.NewHttpGetter(),
 	}
 
-	for _, v := range api_call {
+	for _, v := range mappings {
 		data, err := apicaller.Get(v)
 
 		if err != nil {
