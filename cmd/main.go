@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/thslopes/bff/apicall"
 	"github.com/thslopes/bff/setup"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 func main() {
@@ -18,14 +21,27 @@ func main() {
 		Getter: apicall.NewHttpGetter(),
 	}
 
-	for _, v := range mappings {
-		data, err := apicaller.Get(v)
+	app := fiber.New()
 
-		if err != nil {
-			fmt.Println(err)
-			return
+	// Define a route for the GET method on the root path '/'
+	app.Get("/", func(c fiber.Ctx) error {
+		// args:= map[string]string{}
+		// c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+		// args[string(k)] = string(v)
+		// })
+		for _, v := range mappings {
+			data, err := apicaller.Get(v)
+
+			if err != nil {
+				fmt.Println(err)
+				return c.SendString("Error")
+			}
+
+			return c.SendString(string(data))
 		}
+		return c.SendString("no")
+	})
 
-		fmt.Println(string(data))
-	}
+	log.Fatal(app.Listen(":3000"))
+
 }
