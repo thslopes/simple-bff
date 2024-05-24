@@ -18,12 +18,14 @@ func main() {
 		Getter: apicall.NewHttpGetter(),
 	}
 
-	data, err := apicaller.Get(api_call)
+	for _, v := range api_call {
+		data, err := apicaller.Get(v)
 
-	if err != nil {
-		fmt.Println(err)
-		return
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println(string(data))
 	}
-
-	fmt.Println(string(data))
 }

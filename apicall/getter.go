@@ -1,8 +1,7 @@
 package apicall
 
 import (
-	"io"
-	"net/http"
+	"github.com/gofiber/fiber/v3/client"
 )
 
 type GetterErr struct {
@@ -29,12 +28,12 @@ func (f *FakeGetter) Get(url string) ([]byte, error) {
 }
 
 type httpGetter struct {
-	Client *http.Client
+	Client *client.Client
 }
 
 func NewHttpGetter() Getter {
 	return &httpGetter{
-		Client: &http.Client{},
+		Client: client.New(),
 	}
 }
 
@@ -43,13 +42,6 @@ func (h *httpGetter) Get(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
+	return resp.RawResponse.Body(), nil
 }

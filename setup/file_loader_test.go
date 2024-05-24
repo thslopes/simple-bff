@@ -12,14 +12,16 @@ func TestLoadApiCallFromFile(t *testing.T) {
 	tests := []struct {
 		name     string
 		filePath string
-		want     *apicall.ApiCall
+		want     map[string]apicall.ApiCall
 		wantErr  error
 	}{
 		{
 			name:     "success",
 			filePath: "../testData/testFile.json",
-			want: &apicall.ApiCall{
-				Url: "http://hello.com",
+			want: map[string]apicall.ApiCall{
+				"swapi-people": {
+					Url: "https://swapi.dev/api/people/1/",
+				},
 			},
 			wantErr: nil,
 		},

@@ -1,3 +1,12 @@
 {
-    "url": "http://hello.com"
+    "swapi-people": {
+        "url": "https://swapi.dev/api/people/1/",
+        "queryParams": [
+            {
+                "name": "format",
+                "type": "constant",
+                "value": "json"
+            }
+        ]
+    }
 }

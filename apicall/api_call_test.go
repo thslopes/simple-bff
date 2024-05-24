@@ -10,7 +10,7 @@ func TestCaller_Get(t *testing.T) {
 		Getter Getter
 	}
 	type args struct {
-		apiCall *ApiCall
+		apiCall ApiCall
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +25,7 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: &ApiCall{
+				apiCall: ApiCall{
 					Url: "http://hello.com",
 				},
 			},
@@ -39,7 +39,7 @@ func TestCaller_Get(t *testing.T) {
 				},
 			},
 			args: args{
-				apiCall: &ApiCall{
+				apiCall: ApiCall{
 					Url: "wrong.url",
 				},
 			},
