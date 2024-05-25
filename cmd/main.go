@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	mappings, err := setup.LoadApiCallFromFile("./mappings/query.json")
+	mappings, err := setup.LoadQueries("./queries/query.json")
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -1,6 +1,6 @@
 {
     "swapi-people": {
-        "url": "https://swapi.dev/api/people/:personId/",
+        "resource": "swapi-people",
         "queryParams": [
             {
                 "name": "format",

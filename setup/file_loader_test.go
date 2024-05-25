@@ -7,20 +7,20 @@ import (
 	"github.com/thslopes/bff/apicall"
 )
 
-func TestLoadApiCallFromFile(t *testing.T) {
+func TestLoadQueries(t *testing.T) {
 	// Test cases
 	tests := []struct {
 		name     string
 		filePath string
-		want     map[string]apicall.ApiCall
+		want     map[string]apicall.Query
 		wantErr  error
 	}{
 		{
 			name:     "success",
-			filePath: "../testData/testFile.json",
-			want: map[string]apicall.ApiCall{
+			filePath: "../testData/query.json",
+			want: map[string]apicall.Query{
 				"swapi-people": {
-					Url: "https://swapi.dev/api/people/:personId/",
+					Resource: "swapi-people",
 					QueryParams: []apicall.Param{
 						{Name: "format", Value: "json", Type: "constant"},
 						{Name: "other", Value: "hello", Type: "querystring"},
@@ -47,7 +47,7 @@ func TestLoadApiCallFromFile(t *testing.T) {
 	// Run tests
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := LoadApiCallFromFile(test.filePath)
+			got, err := LoadQueries(test.filePath)
 			if diff := cmp.Diff(test.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}

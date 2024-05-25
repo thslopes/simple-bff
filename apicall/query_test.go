@@ -11,7 +11,7 @@ func TestCaller_Get(t *testing.T) {
 		Getter Getter
 	}
 	type args struct {
-		apiCall     ApiCall
+		apiCall     Query
 		queryString map[string]string
 		headers     map[string]string
 	}
@@ -28,8 +28,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 				},
 			},
 			want: "http://hello.com",
@@ -40,8 +40,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					PathParams: []Param{
 						{
 							Name:  "name1",
@@ -62,8 +62,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					Headers: []Param{
 						{
 							Name:  "name1",
@@ -84,8 +84,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					QueryParams: []Param{
 						{
 							Name:  "name",
@@ -103,8 +103,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					QueryParams: []Param{
 						{
 							Name:  "name",
@@ -125,8 +125,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					QueryParams: []Param{
 						{
 							Name:  "name",
@@ -147,8 +147,8 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "http://hello.com",
+				apiCall: Query{
+					Resource: "http://hello.com",
 					QueryParams: []Param{
 						{
 							Name:  "name",
@@ -176,8 +176,8 @@ func TestCaller_Get(t *testing.T) {
 				},
 			},
 			args: args{
-				apiCall: ApiCall{
-					Url: "wrong.url",
+				apiCall: Query{
+					Resource: "wrong.url",
 				},
 			},
 			wantErr: &GetterErr{

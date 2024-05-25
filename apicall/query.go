@@ -1,7 +1,7 @@
 package apicall
 
-type ApiCall struct {
-	Url         string
+type Query struct {
+	Resource    string
 	QueryParams []Param
 	PathParams  []Param
 	Headers     []Param
@@ -17,8 +17,8 @@ type Caller struct {
 	Getter Getter
 }
 
-func (c *Caller) Get(apiCall ApiCall, queryString, headers map[string]string) ([]byte, error) {
-	url := apiCall.Url
+func (c *Caller) Get(apiCall Query, queryString, headers map[string]string) ([]byte, error) {
+	url := apiCall.Resource
 
 	queryParams := map[string]string{}
 	for _, v := range apiCall.QueryParams {
