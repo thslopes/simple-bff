@@ -28,6 +28,9 @@ func TestLoadApiCallFromFile(t *testing.T) {
 					PathParams: []apicall.Param{
 						{Name: "personId", Value: "personId", Type: "querystring"},
 					},
+					Headers: []apicall.Param{
+						{Name: "Authorization", Value: "Bearer 1234", Type: "constant"},
+					},
 				},
 			},
 			wantErr: nil,

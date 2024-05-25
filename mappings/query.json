@@ -19,6 +19,13 @@
                 "type": "querystring",
                 "value": "personId"
             }
+        ],
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "constant",
+                "value": "Bearer 1234"
+            }
         ]
     }
 }

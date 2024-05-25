@@ -57,6 +57,28 @@ func TestCaller_Get(t *testing.T) {
 			want: "http://hello.com/name1pathValue",
 		},
 		{
+			name: "with path headers",
+			fields: fields{
+				Getter: &FakeGetter{},
+			},
+			args: args{
+				apiCall: ApiCall{
+					Url: "http://hello.com",
+					Headers: []Param{
+						{
+							Name:  "name1",
+							Value: "value",
+							Type:  "querystring",
+						},
+					},
+				},
+				queryString: map[string]string{
+					"value": "headerValue",
+				},
+			},
+			want: "http://hello.comHname1headerValue",
+		},
+		{
 			name: "with constant qs params",
 			fields: fields{
 				Getter: &FakeGetter{},

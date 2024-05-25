@@ -4,6 +4,7 @@ type ApiCall struct {
 	Url         string
 	QueryParams []Param
 	PathParams  []Param
+	Headers     []Param
 }
 
 type Param struct {
@@ -29,7 +30,12 @@ func (c *Caller) Get(apiCall ApiCall, queryString, headers map[string]string) ([
 		pathParams[v.Name] = getParamValue(v, queryString, headers)
 	}
 
-	return c.Getter.Get(url, queryParams, pathParams)
+	headersParams := map[string]string{}
+	for _, v := range apiCall.Headers {
+		headersParams[v.Name] = getParamValue(v, queryString, headers)
+	}
+
+	return c.Getter.Get(url, queryParams, pathParams, headersParams)
 }
 
 func getParamValue(v Param, queryString map[string]string, headers map[string]string) string {
