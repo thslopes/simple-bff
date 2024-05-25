@@ -25,12 +25,16 @@ func main() {
 
 	// Define a route for the GET method on the root path '/'
 	app.Get("/", func(c fiber.Ctx) error {
-		// args:= map[string]string{}
-		// c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
-		// args[string(k)] = string(v)
-		// })
+		queryParams := map[string]string{}
+		c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+			queryParams[string(k)] = string(v)
+		})
+		headers := map[string]string{}
+		c.Request().Header.VisitAll(func(k, v []byte) {
+			headers[string(k)] = string(v)
+		})
 		for _, v := range mappings {
-			data, err := apicaller.Get(v)
+			data, err := apicaller.Get(v, queryParams, headers)
 
 			if err != nil {
 				fmt.Println(err)

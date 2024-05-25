@@ -21,6 +21,7 @@ func TestLoadApiCallFromFile(t *testing.T) {
 			want: map[string]apicall.ApiCall{
 				"swapi-people": {
 					Url: "https://swapi.dev/api/people/1/",
+					QueryParams: []apicall.QueryParam{{Name: "format", Value: "json", Type: "constant"}},
 				},
 			},
 			wantErr: nil,

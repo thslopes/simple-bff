@@ -1,11 +1,16 @@
 {
     "swapi-people": {
-        "url": "https://swapi.dev/api/people/1/?format=json",
+        "url": "https://swapi.dev/api/people/1/",
         "queryParams": [
             {
                 "name": "format",
                 "type": "constant",
                 "value": "json"
+            },
+            {
+                "name": "other",
+                "type": "querystring",
+                "value": "hello"
             }
         ]
     }

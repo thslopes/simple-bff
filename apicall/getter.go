@@ -1,6 +1,8 @@
 package apicall
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v3/client"
 )
 
@@ -38,6 +40,7 @@ func NewHttpGetter() Getter {
 }
 
 func (h *httpGetter) Get(url string) ([]byte, error) {
+	fmt.Println(url)
 	resp, err := h.Client.Get(url)
 	if err != nil {
 		return nil, err
