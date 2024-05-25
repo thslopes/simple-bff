@@ -13,19 +13,22 @@ func (e *GetterErr) Error() string {
 }
 
 type Getter interface {
-	Get(url string, qs map[string]string) ([]byte, error)
+	Get(url string, qs, pathParams map[string]string) ([]byte, error)
 }
 
 type FakeGetter struct {
 	Error bool
 }
 
-func (f *FakeGetter) Get(url string, qs map[string]string) ([]byte, error) {
+func (f *FakeGetter) Get(url string, qs, pathParams map[string]string) ([]byte, error) {
 	if f.Error {
 		return nil, &GetterErr{Err: url}
 	}
 	for k, v := range qs {
 		url += k + v
+	}
+	for k, v := range pathParams {
+		url += "/" + k + v
 	}
 	return []byte(url), nil
 }
@@ -40,9 +43,10 @@ func NewHttpGetter() Getter {
 	}
 }
 
-func (h *httpGetter) Get(url string, qs map[string]string) ([]byte, error) {
+func (h *httpGetter) Get(url string, qs, pathParams map[string]string) ([]byte, error) {
 	resp, err := h.Client.Get(url, client.Config{
-		Param: qs,
+		Param:     qs,
+		PathParam: pathParams,
 	})
 	if err != nil {
 		return nil, err

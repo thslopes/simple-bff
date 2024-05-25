@@ -35,6 +35,28 @@ func TestCaller_Get(t *testing.T) {
 			want: "http://hello.com",
 		},
 		{
+			name: "with path params",
+			fields: fields{
+				Getter: &FakeGetter{},
+			},
+			args: args{
+				apiCall: ApiCall{
+					Url: "http://hello.com",
+					PathParams: []Param{
+						{
+							Name:  "name1",
+							Value: "value",
+							Type:  "querystring",
+						},
+					},
+				},
+				queryString: map[string]string{
+					"value": "pathValue",
+				},
+			},
+			want: "http://hello.com/name1pathValue",
+		},
+		{
 			name: "with constant qs params",
 			fields: fields{
 				Getter: &FakeGetter{},
@@ -42,7 +64,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				apiCall: ApiCall{
 					Url: "http://hello.com",
-					QueryParams: []QueryParam{
+					QueryParams: []Param{
 						{
 							Name:  "name",
 							Value: "value",
@@ -61,7 +83,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				apiCall: ApiCall{
 					Url: "http://hello.com",
-					QueryParams: []QueryParam{
+					QueryParams: []Param{
 						{
 							Name:  "name",
 							Value: "qsKey",
@@ -83,7 +105,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				apiCall: ApiCall{
 					Url: "http://hello.com",
-					QueryParams: []QueryParam{
+					QueryParams: []Param{
 						{
 							Name:  "name",
 							Value: "headerKey",
@@ -105,7 +127,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				apiCall: ApiCall{
 					Url: "http://hello.com",
-					QueryParams: []QueryParam{
+					QueryParams: []Param{
 						{
 							Name:  "name",
 							Value: "value",

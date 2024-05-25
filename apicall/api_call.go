@@ -2,10 +2,11 @@ package apicall
 
 type ApiCall struct {
 	Url         string
-	QueryParams []QueryParam
+	QueryParams []Param
+	PathParams  []Param
 }
 
-type QueryParam struct {
+type Param struct {
 	Name  string
 	Value string
 	Type  string
@@ -20,15 +21,26 @@ func (c *Caller) Get(apiCall ApiCall, queryString, headers map[string]string) ([
 
 	queryParams := map[string]string{}
 	for _, v := range apiCall.QueryParams {
-		switch v.Type {
-		case "constant":
-			queryParams[v.Name] = v.Value
-		case "querystring":
-			queryParams[v.Name] = queryString[v.Value]
-		case "header":
-			queryParams[v.Name] = headers[v.Value]
-		}
+		queryParams[v.Name] = getParamValue(v, queryString, headers)
 	}
 
-	return c.Getter.Get(url, queryParams)
+	pathParams := map[string]string{}
+	for _, v := range apiCall.PathParams {
+		pathParams[v.Name] = getParamValue(v, queryString, headers)
+	}
+
+	return c.Getter.Get(url, queryParams, pathParams)
+}
+
+func getParamValue(v Param, queryString map[string]string, headers map[string]string) string {
+	va := ""
+	switch v.Type {
+	case "constant":
+		va = v.Value
+	case "querystring":
+		va = queryString[v.Value]
+	case "header":
+		va = headers[v.Value]
+	}
+	return va
 }

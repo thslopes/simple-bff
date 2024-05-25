@@ -1,11 +1,23 @@
 {
     "swapi-people": {
-        "url": "https://swapi.dev/api/people/1/",
+        "url": "https://swapi.dev/api/people/:personId/",
         "queryParams": [
             {
                 "name": "format",
                 "type": "constant",
                 "value": "json"
+            },
+            {
+                "name": "other",
+                "type": "querystring",
+                "value": "hello"
+            }
+        ],
+        "pathParams": [
+            {
+                "name": "personId",
+                "type": "querystring",
+                "value": "personId"
             }
         ]
     }

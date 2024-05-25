@@ -20,8 +20,14 @@ func TestLoadApiCallFromFile(t *testing.T) {
 			filePath: "../testData/testFile.json",
 			want: map[string]apicall.ApiCall{
 				"swapi-people": {
-					Url: "https://swapi.dev/api/people/1/",
-					QueryParams: []apicall.QueryParam{{Name: "format", Value: "json", Type: "constant"}},
+					Url: "https://swapi.dev/api/people/:personId/",
+					QueryParams: []apicall.Param{
+						{Name: "format", Value: "json", Type: "constant"},
+						{Name: "other", Value: "hello", Type: "querystring"},
+					},
+					PathParams: []apicall.Param{
+						{Name: "personId", Value: "personId", Type: "querystring"},
+					},
 				},
 			},
 			wantErr: nil,
