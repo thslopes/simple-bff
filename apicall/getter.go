@@ -1,8 +1,6 @@
 package apicall
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v3/client"
 )
 
@@ -15,16 +13,19 @@ func (e *GetterErr) Error() string {
 }
 
 type Getter interface {
-	Get(string) ([]byte, error)
+	Get(url string, qs map[string]string) ([]byte, error)
 }
 
 type FakeGetter struct {
 	Error bool
 }
 
-func (f *FakeGetter) Get(url string) ([]byte, error) {
+func (f *FakeGetter) Get(url string, qs map[string]string) ([]byte, error) {
 	if f.Error {
 		return nil, &GetterErr{Err: url}
+	}
+	for k, v := range qs {
+		url += k + v
 	}
 	return []byte(url), nil
 }
@@ -39,9 +40,10 @@ func NewHttpGetter() Getter {
 	}
 }
 
-func (h *httpGetter) Get(url string) ([]byte, error) {
-	fmt.Println(url)
-	resp, err := h.Client.Get(url)
+func (h *httpGetter) Get(url string, qs map[string]string) ([]byte, error) {
+	resp, err := h.Client.Get(url, client.Config{
+		Param: qs,
+	})
 	if err != nil {
 		return nil, err
 	}

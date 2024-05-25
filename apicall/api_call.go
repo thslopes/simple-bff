@@ -18,20 +18,17 @@ type Caller struct {
 func (c *Caller) Get(apiCall ApiCall, queryString, headers map[string]string) ([]byte, error) {
 	url := apiCall.Url
 
-	queryParams := ""
+	queryParams := map[string]string{}
 	for _, v := range apiCall.QueryParams {
 		switch v.Type {
 		case "constant":
-			queryParams += v.Name + "=" + v.Value + "&"
+			queryParams[v.Name] = v.Value
 		case "querystring":
-			queryParams += v.Name + "=" + queryString[v.Value] + "&"
+			queryParams[v.Name] = queryString[v.Value]
 		case "header":
-			queryParams += v.Name + "=" + headers[v.Value] + "&"
+			queryParams[v.Name] = headers[v.Value]
 		}
 	}
-	if queryParams != "" {
-		url += "?" + queryParams[:len(queryParams)-1]
-	}
 
-	return c.Getter.Get(url)
+	return c.Getter.Get(url, queryParams)
 }

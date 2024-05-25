@@ -5,7 +5,7 @@
             {
                 "name": "format",
                 "type": "constant",
-                "value": "json"
+                "value": "wookiee"
             },
             {
                 "name": "other",

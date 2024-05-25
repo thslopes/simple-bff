@@ -51,7 +51,7 @@ func TestCaller_Get(t *testing.T) {
 					},
 				},
 			},
-			want: "http://hello.com?name=value",
+			want: "http://hello.comnamevalue",
 		},
 		{
 			name: "with qs to qs params",
@@ -73,7 +73,7 @@ func TestCaller_Get(t *testing.T) {
 					"qsKey": "qsValue",
 				},
 			},
-			want: "http://hello.com?name=qsValue",
+			want: "http://hello.comnameqsValue",
 		},
 		{
 			name: "with header to qs params",
@@ -95,7 +95,7 @@ func TestCaller_Get(t *testing.T) {
 					"headerKey": "headerValue",
 				},
 			},
-			want: "http://hello.com?name=headerValue",
+			want: "http://hello.comnameheaderValue",
 		},
 		{
 			name: "with qs and constant qs params",
@@ -122,7 +122,7 @@ func TestCaller_Get(t *testing.T) {
 					"qsKey": "qsValue",
 				},
 			},
-			want: "http://hello.com?name=value&name2=qsValue",
+			want: "http://hello.comnamevaluename2qsValue",
 		},
 		{
 			name: "error",
