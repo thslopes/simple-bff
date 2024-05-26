@@ -33,14 +33,14 @@ func main() {
 	app := fiber.New()
 
 	// Define a route for the GET method on the root path '/'
-	app.Get("/:query", newFunction)
-	app.Post("/:query", newFunction)
+	app.Get("/:query", handler)
+	app.Post("/:query", handler)
 
 	log.Fatal(app.Listen(":3000"))
 
 }
 
-func newFunction(c fiber.Ctx) error {
+func handler(c fiber.Ctx) error {
 	queryParams := map[string]string{}
 	c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
 		queryParams[string(k)] = string(v)
