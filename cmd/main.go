@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -9,6 +10,10 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 )
+
+var apicaller = apicall.Caller{
+	Getter: apicall.NewHttpGetter(),
+}
 
 func main() {
 	queries, err := setup.LoadQueries()
@@ -25,31 +30,38 @@ func main() {
 	}
 	apicall.Resources = resources
 
-	apicaller := apicall.Caller{
-		Getter: apicall.NewHttpGetter(),
-	}
-
 	app := fiber.New()
 
 	// Define a route for the GET method on the root path '/'
-	app.Get("/:query", func(c fiber.Ctx) error {
-		queryParams := map[string]string{}
-		c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
-			queryParams[string(k)] = string(v)
-		})
-		headers := map[string]string{}
-		c.Request().Header.VisitAll(func(k, v []byte) {
-			headers[string(k)] = string(v)
-		})
-		data, err := apicaller.Do(c.Params("query"), queryParams, headers)
-
-		if err != nil {
-			return err
-		}
-
-		return c.JSON(data)
-	})
+	app.Get("/:query", newFunction)
+	app.Post("/:query", newFunction)
 
 	log.Fatal(app.Listen(":3000"))
 
+}
+
+func newFunction(c fiber.Ctx) error {
+	queryParams := map[string]string{}
+	c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+		queryParams[string(k)] = string(v)
+	})
+	headers := map[string]string{}
+	c.Request().Header.VisitAll(func(k, v []byte) {
+		headers[string(k)] = string(v)
+	})
+
+	body := c.Request().Body()
+	var bodyData interface{}
+	err := json.Unmarshal(body, &bodyData)
+	if err != nil {
+		return err
+	}
+
+	data, err := apicaller.Do(c.Params("query"), queryParams, headers, bodyData)
+
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(data)
 }

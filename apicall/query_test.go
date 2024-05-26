@@ -91,6 +91,7 @@ func TestCaller_Do(t *testing.T) {
 		query       string
 		queryString map[string]string
 		headers     map[string]string
+		body        interface{}
 	}
 	tests := []struct {
 		name       string
@@ -221,6 +222,23 @@ func TestCaller_Do(t *testing.T) {
 			},
 		},
 		{
+			name: "with body",
+			fields: fields{
+				Getter: &FakeGetter{},
+			},
+			args: args{
+				query: "success",
+				body:  []byte("body"),
+			},
+			wantGetter: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+				Body:       []byte("body"),
+			},
+		},
+		{
 			name: "error",
 			fields: fields{
 				Getter: &FakeGetter{
@@ -243,7 +261,7 @@ func TestCaller_Do(t *testing.T) {
 			c := &Caller{
 				Getter: tt.fields.Getter,
 			}
-			_, err := c.Do(tt.args.query, tt.args.queryString, tt.args.headers)
+			_, err := c.Do(tt.args.query, tt.args.queryString, tt.args.headers, tt.args.body)
 			if diff := cmp.Diff(tt.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}

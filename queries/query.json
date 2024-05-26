@@ -28,5 +28,9 @@
             }
         ],
         "returns": ["name"]
+    },
+    "localtest":{
+        "resource": "localtest",
+        "returns": ["*"]
     }
 }

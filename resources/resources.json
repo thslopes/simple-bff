@@ -2,5 +2,9 @@
     "swapi-people": {
         "url":"https://swapi.dev/api/people/:personId/",
         "method":"GET"
+    },
+    "localtest":{
+        "url":"http://localhost:8080/test",
+        "method":"POST"
     }
 }

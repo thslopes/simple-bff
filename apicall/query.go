@@ -36,7 +36,7 @@ type Caller struct {
 	Getter Getter
 }
 
-func (c *Caller) Do(query string, queryString, headers map[string]string) (interface{}, error) {
+func (c *Caller) Do(query string, queryString, headers map[string]string, body interface{}) (interface{}, error) {
 	apiCall := Queries[query]
 	resource := Resources[apiCall.Resource]
 
@@ -55,14 +55,14 @@ func (c *Caller) Do(query string, queryString, headers map[string]string) (inter
 		headersParams[v.Name] = getParamValue(v, queryString, headers)
 	}
 
-	body, err := c.Getter.Do(resource, queryParams, pathParams, headersParams)
+	respBody, err := c.Getter.Do(resource, queryParams, pathParams, headersParams, body)
 
 	if err != nil {
 		return nil, err
 	}
 
 	var mapData interface{}
-	err = json.Unmarshal(body, &mapData)
+	err = json.Unmarshal(respBody, &mapData)
 
 	if err != nil {
 		return nil, &QueryErr{Err: err}
