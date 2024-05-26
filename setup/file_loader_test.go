@@ -64,14 +64,17 @@ func TestLoadResources(t *testing.T) {
 	tests := []struct {
 		name     string
 		filePath string
-		want     map[string]string
+		want     map[string]apicall.Resource
 		wantErr  error
 	}{
 		{
 			name:     "success",
 			filePath: "../testData/resource.json",
-			want: map[string]string{
-				"swapi-people": "https://swapi.dev/api/people/:personId/",
+			want: map[string]apicall.Resource{
+				"swapi-people": {
+					Url:    "https://swapi.dev/api/people/:personId/",
+					Method: "GET",
+				},
 			},
 			wantErr: nil,
 		},

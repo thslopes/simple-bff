@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+type Resource struct {
+	Url    string
+	Method string
+}
+
 type QueryErr struct {
 	Err error
 }
@@ -33,7 +38,7 @@ type Caller struct {
 
 func (c *Caller) Get(query string, queryString, headers map[string]string) (interface{}, error) {
 	apiCall := Queries[query]
-	url := Resources[apiCall.Resource]
+	resource := Resources[apiCall.Resource]
 
 	queryParams := map[string]string{}
 	for _, v := range apiCall.QueryParams {
@@ -50,7 +55,7 @@ func (c *Caller) Get(query string, queryString, headers map[string]string) (inte
 		headersParams[v.Name] = getParamValue(v, queryString, headers)
 	}
 
-	body, err := c.Getter.Get(url, queryParams, pathParams, headersParams)
+	body, err := c.Getter.Get(resource, queryParams, pathParams, headersParams)
 
 	if err != nil {
 		return nil, err
@@ -75,7 +80,7 @@ func parseResult(data interface{}, results []string) interface{} {
 			resArray := []interface{}{}
 			mapDataArray := data.([]interface{})
 			for _, v := range mapDataArray {
-				resArray = append(resArray, parseResult(v, []string{strings.Join(props[1:],".")}))
+				resArray = append(resArray, parseResult(v, []string{strings.Join(props[1:], ".")}))
 			}
 			return resArray
 		}
@@ -87,7 +92,7 @@ func parseResult(data interface{}, results []string) interface{} {
 			}
 			res[props[0]] = mapData[property]
 		} else {
-			res[props[0]] = parseResult(mapData[props[0]], []string{strings.Join(props[1:],".")})
+			res[props[0]] = parseResult(mapData[props[0]], []string{strings.Join(props[1:], ".")})
 		}
 	}
 

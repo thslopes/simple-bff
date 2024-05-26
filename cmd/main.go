@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/thslopes/bff/apicall"
 	"github.com/thslopes/bff/setup"
@@ -34,19 +32,6 @@ func main() {
 	app := fiber.New()
 
 	// Define a route for the GET method on the root path '/'
-	app.Get("/p1", func(c fiber.Ctx) error {
-		plan, err := os.ReadFile("testData/p1.json")
-		if err != nil {
-			return err
-		}
-		var data interface{}
-		err = json.Unmarshal(plan, &data)
-		if err != nil {
-			return err
-		}
-		return c.JSON(data)
-
-	})
 	app.Get("/", func(c fiber.Ctx) error {
 		queryParams := map[string]string{}
 		c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
@@ -56,7 +41,7 @@ func main() {
 		c.Request().Header.VisitAll(func(k, v []byte) {
 			headers[string(k)] = string(v)
 		})
-		data, err := apicaller.Get("app-bff-product", queryParams, headers)
+		data, err := apicaller.Get("swapi-people", queryParams, headers)
 
 		if err != nil {
 			return err

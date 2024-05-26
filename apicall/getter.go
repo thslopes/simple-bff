@@ -13,7 +13,7 @@ func (e *GetterErr) Error() string {
 }
 
 type Getter interface {
-	Get(url string, qs, pathParams, headers map[string]string) ([]byte, error)
+	Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error)
 }
 
 type FakeGetter struct {
@@ -22,11 +22,11 @@ type FakeGetter struct {
 	Qs, PathParams, Headers map[string]string
 }
 
-func (f *FakeGetter) Get(url string, qs, pathParams, headers map[string]string) ([]byte, error) {
+func (f *FakeGetter) Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
 	if f.Error {
-		return nil, &GetterErr{Err: url}
+		return nil, &GetterErr{Err: resource.Url}
 	}
-	f.Url = url
+	f.Url = resource.Url
 	f.Qs = qs
 	f.PathParams = pathParams
 	f.Headers = headers
@@ -43,12 +43,14 @@ func NewHttpGetter() Getter {
 	}
 }
 
-func (h *httpGetter) Get(url string, qs, pathParams, headers map[string]string) ([]byte, error) {
-	resp, err := h.Client.Get(url, client.Config{
-		Param:     qs,
-		PathParam: pathParams,
-		Header:    headers,
-	})
+func (h *httpGetter) Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
+	resp, err := h.Client.Custom(resource.Url, resource.Method,
+		client.Config{
+			Param:     qs,
+			PathParam: pathParams,
+			Header:    headers,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

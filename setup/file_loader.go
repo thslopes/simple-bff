@@ -34,12 +34,12 @@ func LoadQueries() (map[string]apicall.Query, error) {
 	return data, nil
 }
 
-func LoadResources() (map[string]string, error) {
+func LoadResources() (map[string]apicall.Resource, error) {
 	plan, err := os.ReadFile(resourcesPath)
 	if err != nil {
 		return nil, &LoadFileErr{Err: err.Error()}
 	}
-	var data map[string]string
+	var data map[string]apicall.Resource
 	err = json.Unmarshal(plan, &data)
 	if err != nil {
 		return nil, &LoadFileErr{Err: err.Error()}

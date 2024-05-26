@@ -7,9 +7,9 @@ import (
 )
 
 func TestCaller_Get(t *testing.T) {
-	Resources = map[string]string{
-		"hello":    "http://hello.com",
-		"wrongurl": "wrong.url",
+	Resources = map[string]Resource{
+		"hello":    Resource{Url: "http://hello.com"},
+		"wrongurl": Resource{Url: "wrong.url"},
 	}
 	Queries = map[string]Query{
 		"success": {
