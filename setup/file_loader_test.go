@@ -47,11 +47,49 @@ func TestLoadQueries(t *testing.T) {
 	// Run tests
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := LoadQueries(test.filePath)
+			queriesPath = test.filePath
+			got, err := LoadQueries()
 			if diff := cmp.Diff(test.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
 			if diff := cmp.Diff(test.want, got); diff != "" {
+				t.Errorf("(-expected +actual):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestLoadResources(t *testing.T) {
+	tests := []struct {
+		name     string
+		filePath string
+		want     map[string]string
+		wantErr  error
+	}{
+		{
+			name:     "success",
+			filePath: "../testData/resource.json",
+			want: map[string]string{
+				"swapi-people": "https://swapi.dev/api/people/:personId/",
+			},
+			wantErr: nil,
+		},
+		{
+			name:     "file not found",
+			filePath: "testData/tesFile.json",
+			wantErr: &LoadFileErr{
+				Err: "open testData/tesFile.json: no such file or directory",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resourcesPath = tt.filePath
+			got, err := LoadResources()
+			if diff := cmp.Diff(tt.wantErr, err); diff != "" {
+				t.Errorf("(-expected +actual):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
 		})

@@ -17,23 +17,20 @@ type Getter interface {
 }
 
 type FakeGetter struct {
-	Error bool
+	Error                   bool
+	Url                     string
+	Qs, PathParams, Headers map[string]string
 }
 
 func (f *FakeGetter) Get(url string, qs, pathParams, headers map[string]string) ([]byte, error) {
 	if f.Error {
 		return nil, &GetterErr{Err: url}
 	}
-	for k, v := range qs {
-		url += k + v
-	}
-	for k, v := range pathParams {
-		url += "/" + k + v
-	}
-	for k, v := range headers {
-		url += "H" + k + v
-	}
-	return []byte(url), nil
+	f.Url = url
+	f.Qs = qs
+	f.PathParams = pathParams
+	f.Headers = headers
+	return []byte("fake"), nil
 }
 
 type httpGetter struct {

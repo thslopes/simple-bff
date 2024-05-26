@@ -17,8 +17,9 @@ type Caller struct {
 	Getter Getter
 }
 
-func (c *Caller) Get(apiCall Query, queryString, headers map[string]string) ([]byte, error) {
-	url := apiCall.Resource
+func (c *Caller) Get(query string, queryString, headers map[string]string) ([]byte, error) {
+	apiCall := Queries[query]
+	url := Resources[apiCall.Resource]
 
 	queryParams := map[string]string{}
 	for _, v := range apiCall.QueryParams {

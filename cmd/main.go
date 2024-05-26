@@ -11,11 +11,19 @@ import (
 )
 
 func main() {
-	mappings, err := setup.LoadQueries("./queries/query.json")
+	queries, err := setup.LoadQueries()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	apicall.Queries = queries
+
+	resources, err := setup.LoadResources()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	apicall.Resources = resources
 
 	apicaller := apicall.Caller{
 		Getter: apicall.NewHttpGetter(),
@@ -33,17 +41,14 @@ func main() {
 		c.Request().Header.VisitAll(func(k, v []byte) {
 			headers[string(k)] = string(v)
 		})
-		for _, v := range mappings {
-			data, err := apicaller.Get(v, queryParams, headers)
+		data, err := apicaller.Get("swapi-people", queryParams, headers)
 
-			if err != nil {
-				fmt.Println(err)
-				return c.SendString("Error")
-			}
-
-			return c.SendString(string(data))
+		if err != nil {
+			fmt.Println(err)
+			return c.SendString("Error")
 		}
-		return c.SendString("no")
+
+		return c.SendString(string(data))
 	})
 
 	log.Fatal(app.Listen(":3000"))

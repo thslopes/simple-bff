@@ -1,5 +1,3 @@
 {
-    "swapi-people": {
-        "url": "https://swapi.dev/api/people/:personId/"
-    }
+    "swapi-people": "https://swapi.dev/api/people/:personId/"
 }

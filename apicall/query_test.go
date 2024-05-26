@@ -7,11 +7,88 @@ import (
 )
 
 func TestCaller_Get(t *testing.T) {
+	Resources = map[string]string{
+		"hello": "http://hello.com",
+		"wrongurl": "wrong.url",
+	}
+	Queries = map[string]Query{
+		"success": {
+			Resource: "hello",
+		},
+		"withPathParams": {
+			Resource: "hello",
+			PathParams: []Param{
+				{
+					Name:  "name1",
+					Value: "value",
+					Type:  "querystring",
+				},
+			},
+		},
+		"withHeaders": {
+			Resource: "hello",
+			Headers: []Param{
+				{
+					Name:  "name1",
+					Value: "value",
+					Type:  "querystring",
+				},
+			},
+		},
+		"withConstantQs": {
+			Resource: "hello",
+			QueryParams: []Param{
+				{
+					Name:  "name",
+					Value: "value",
+					Type:  "constant",
+				},
+			},
+		},
+		"withQsToQs": {
+			Resource: "hello",
+			QueryParams: []Param{
+				{
+					Name:  "name",
+					Value: "qsKey",
+					Type:  "querystring",
+				},
+			},
+		},
+		"withHeaderToQs": {
+			Resource: "hello",
+			QueryParams: []Param{
+				{
+					Name:  "name",
+					Value: "headerKey",
+					Type:  "header",
+				},
+			},
+		},
+		"withQsAndConstantQs": {
+			Resource: "hello",
+			QueryParams: []Param{
+				{
+					Name:  "name",
+					Value: "value",
+					Type:  "constant",
+				},
+				{
+					Name:  "name2",
+					Value: "qsKey",
+					Type:  "querystring",
+				},
+			},
+		},
+		"error": {
+			Resource: "wrongurl",
+		},
+	}
 	type fields struct {
-		Getter Getter
+		Getter *FakeGetter
 	}
 	type args struct {
-		apiCall     Query
+		query       string
 		queryString map[string]string
 		headers     map[string]string
 	}
@@ -19,7 +96,7 @@ func TestCaller_Get(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    string
+		want    *FakeGetter
 		wantErr error
 	}{
 		{
@@ -28,11 +105,14 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-				},
+				query: "success",
 			},
-			want: "http://hello.com",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "with path params",
@@ -40,21 +120,17 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					PathParams: []Param{
-						{
-							Name:  "name1",
-							Value: "value",
-							Type:  "querystring",
-						},
-					},
-				},
+				query: "withPathParams",
 				queryString: map[string]string{
 					"value": "pathValue",
 				},
 			},
-			want: "http://hello.com/name1pathValue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{},
+				PathParams: map[string]string{"name1": "pathValue"},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "with path headers",
@@ -62,21 +138,17 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					Headers: []Param{
-						{
-							Name:  "name1",
-							Value: "value",
-							Type:  "querystring",
-						},
-					},
-				},
+				query: "withHeaders",
 				queryString: map[string]string{
 					"value": "headerValue",
 				},
 			},
-			want: "http://hello.comHname1headerValue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{"name1": "headerValue"},
+			},
 		},
 		{
 			name: "with constant qs params",
@@ -84,18 +156,14 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					QueryParams: []Param{
-						{
-							Name:  "name",
-							Value: "value",
-							Type:  "constant",
-						},
-					},
-				},
+				query: "withConstantQs",
 			},
-			want: "http://hello.comnamevalue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{"name": "value"},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "with qs to qs params",
@@ -103,21 +171,17 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					QueryParams: []Param{
-						{
-							Name:  "name",
-							Value: "qsKey",
-							Type:  "querystring",
-						},
-					},
-				},
+				query: "withQsToQs",
 				queryString: map[string]string{
 					"qsKey": "qsValue",
 				},
 			},
-			want: "http://hello.comnameqsValue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{"name": "qsValue"},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "with header to qs params",
@@ -125,21 +189,17 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					QueryParams: []Param{
-						{
-							Name:  "name",
-							Value: "headerKey",
-							Type:  "header",
-						},
-					},
-				},
+				query: "withHeaderToQs",
 				headers: map[string]string{
 					"headerKey": "headerValue",
 				},
 			},
-			want: "http://hello.comnameheaderValue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{"name": "headerValue"},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "with qs and constant qs params",
@@ -147,26 +207,17 @@ func TestCaller_Get(t *testing.T) {
 				Getter: &FakeGetter{},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "http://hello.com",
-					QueryParams: []Param{
-						{
-							Name:  "name",
-							Value: "value",
-							Type:  "constant",
-						},
-						{
-							Name:  "name2",
-							Value: "qsKey",
-							Type:  "querystring",
-						},
-					},
-				},
+				query: "withQsAndConstantQs",
 				queryString: map[string]string{
 					"qsKey": "qsValue",
 				},
 			},
-			want: "http://hello.comnamevaluename2qsValue",
+			want: &FakeGetter{
+				Url:        "http://hello.com",
+				Qs:         map[string]string{"name": "value", "name2": "qsValue"},
+				PathParams: map[string]string{},
+				Headers:    map[string]string{},
+			},
 		},
 		{
 			name: "error",
@@ -176,12 +227,13 @@ func TestCaller_Get(t *testing.T) {
 				},
 			},
 			args: args{
-				apiCall: Query{
-					Resource: "wrong.url",
-				},
+				query: "error",
 			},
 			wantErr: &GetterErr{
 				Err: "wrong.url",
+			},
+			want: &FakeGetter{
+				Error: true,
 			},
 		},
 	}
@@ -190,11 +242,11 @@ func TestCaller_Get(t *testing.T) {
 			c := &Caller{
 				Getter: tt.fields.Getter,
 			}
-			got, err := c.Get(tt.args.apiCall, tt.args.queryString, tt.args.headers)
+			_, err := c.Get(tt.args.query, tt.args.queryString, tt.args.headers)
 			if diff := cmp.Diff(tt.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
-			if diff := cmp.Diff(tt.want, string(got)); diff != "" {
+			if diff := cmp.Diff(tt.want, tt.fields.Getter); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
 		})
