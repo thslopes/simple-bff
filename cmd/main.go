@@ -41,7 +41,7 @@ func main() {
 		c.Request().Header.VisitAll(func(k, v []byte) {
 			headers[string(k)] = string(v)
 		})
-		data, err := apicaller.Get(c.Params("query"), queryParams, headers)
+		data, err := apicaller.Do(c.Params("query"), queryParams, headers)
 
 		if err != nil {
 			return err

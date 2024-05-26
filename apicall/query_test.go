@@ -6,7 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestCaller_Get(t *testing.T) {
+func TestCaller_Do(t *testing.T) {
 	Resources = map[string]Resource{
 		"hello":    {Url: "http://hello.com"},
 		"wrongurl": {Url: "wrong.url"},
@@ -243,7 +243,7 @@ func TestCaller_Get(t *testing.T) {
 			c := &Caller{
 				Getter: tt.fields.Getter,
 			}
-			_, err := c.Get(tt.args.query, tt.args.queryString, tt.args.headers)
+			_, err := c.Do(tt.args.query, tt.args.queryString, tt.args.headers)
 			if diff := cmp.Diff(tt.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}

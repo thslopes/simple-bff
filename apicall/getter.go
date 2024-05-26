@@ -13,7 +13,7 @@ func (e *GetterErr) Error() string {
 }
 
 type Getter interface {
-	Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error)
+	Do(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error)
 }
 
 type FakeGetter struct {
@@ -22,7 +22,7 @@ type FakeGetter struct {
 	Qs, PathParams, Headers map[string]string
 }
 
-func (f *FakeGetter) Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
+func (f *FakeGetter) Do(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
 	if f.Error {
 		return nil, &GetterErr{Err: resource.Url}
 	}
@@ -43,7 +43,7 @@ func NewHttpGetter() Getter {
 	}
 }
 
-func (h *httpGetter) Get(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
+func (h *httpGetter) Do(resource Resource, qs, pathParams, headers map[string]string) ([]byte, error) {
 	resp, err := h.Client.Custom(resource.Url, resource.Method,
 		client.Config{
 			Param:     qs,
