@@ -1,6 +1,17 @@
 package apicall
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
+
+type QueryErr struct {
+	Err error
+}
+
+func (e *QueryErr) Error() string {
+	return e.Err.Error()
+}
 
 type Query struct {
 	Resource    string
@@ -40,17 +51,44 @@ func (c *Caller) Get(query string, queryString, headers map[string]string) (inte
 	}
 
 	body, err := c.Getter.Get(url, queryParams, pathParams, headersParams)
-	return parseResult(body, apiCall.Returns), err
+
+	if err != nil {
+		return nil, err
+	}
+
+	var mapData interface{}
+	err = json.Unmarshal(body, &mapData)
+
+	if err != nil {
+		return nil, &QueryErr{Err: err}
+	}
+
+	return parseResult(mapData, apiCall.Returns), err
 }
 
-func parseResult(data []byte, results []string) map[string]interface{} {
+func parseResult(data interface{}, results []string) interface{} {
 	res := map[string]interface{}{}
 
-	var mapData map[string]interface{}
-	_ = json.Unmarshal(data, &mapData)
+	for _, property := range results {
+		props := strings.Split(property, ".")
+		if props[0] == "[]" {
+			resArray := []interface{}{}
+			mapDataArray := data.([]interface{})
+			for _, v := range mapDataArray {
+				resArray = append(resArray, parseResult(v, []string{strings.Join(props[1:],".")}))
+			}
+			return resArray
+		}
 
-	for _, v := range results {
-		res[v] = mapData[v]
+		mapData := data.(map[string]interface{})
+		if len(props) == 1 {
+			if props[0] == "*" {
+				return mapData
+			}
+			res[props[0]] = mapData[property]
+		} else {
+			res[props[0]] = parseResult(mapData[props[0]], []string{strings.Join(props[1:],".")})
+		}
 	}
 
 	return res

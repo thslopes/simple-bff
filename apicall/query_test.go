@@ -256,18 +256,18 @@ func TestCaller_Get(t *testing.T) {
 
 func Test_parseResult(t *testing.T) {
 	type args struct {
-		data    []byte
+		data    interface{}
 		results []string
 	}
 	tests := []struct {
 		name string
 		args args
-		want map[string]interface{}
+		want interface{}
 	}{
 		{
 			name: "success",
 			args: args{
-				data: []byte("{\"key\": \"value\", \"key2\": \"value2\"}"),
+				data: map[string]interface{}{"key": "value", "key2": "value2"},
 				results: []string{
 					"key",
 				},
@@ -275,6 +275,75 @@ func Test_parseResult(t *testing.T) {
 			want: map[string]interface{}{
 				"key": "value",
 			},
+		},
+		{
+			name: "subitem",
+			args: args{
+				data: map[string]interface{}{"key": map[string]interface{}{"subkey": "value"}, "key2": "value2"},
+				results: []string{
+					"key.subkey",
+				},
+			},
+			want: map[string]interface{}{
+				"key": map[string]interface{}{
+					"subkey": "value",
+				},
+			},
+		},
+		{
+			name: "all",
+			args: args{
+				data:    map[string]interface{}{"key": map[string]interface{}{"subkey": "value"}, "key2": "value2"},
+				results: []string{"*"},
+			},
+			want: map[string]interface{}{
+				"key": map[string]interface{}{
+					"subkey": "value",
+				},
+				"key2": "value2",
+			},
+		},
+		{
+			name: "array",
+			args: args{
+				data: []interface{}{
+					map[string]interface{}{"key": "value", "key2": "value2"},
+					map[string]interface{}{"key": "value3", "key2": "value4"},
+				},
+				results: []string{"[].*"},
+			},
+			want: []interface{}{
+				map[string]interface{}{"key": "value", "key2": "value2"},
+				map[string]interface{}{"key": "value3", "key2": "value4"},
+			},
+		},
+		{
+			name: "array item",
+			args: args{
+				data: []interface{}{
+					map[string]interface{}{"key": "value", "key2": "value2"},
+					map[string]interface{}{"key": "value3", "key2": "value4"},
+				},
+				results: []string{"[].key2"},
+			},
+			want: []interface{}{
+				map[string]interface{}{"key2": "value2"},
+				map[string]interface{}{"key2": "value4"},
+			},
+		},
+		{
+			name: "item array item",
+			args: args{
+				data: map[string]interface{}{"item": []interface{}{
+					map[string]interface{}{"key": "value", "key2": "value2"},
+					map[string]interface{}{"key": "value3", "key2": "value4"},
+				}},
+				results: []string{"item.[].key2"},
+			},
+			want: map[string]interface{}{"item": []interface{}{
+				map[string]interface{}{"key2": "value2"},
+				map[string]interface{}{"key2": "value4"},
+			}},
 		},
 	}
 	for _, tt := range tests {

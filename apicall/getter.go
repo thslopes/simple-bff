@@ -30,7 +30,7 @@ func (f *FakeGetter) Get(url string, qs, pathParams, headers map[string]string) 
 	f.Qs = qs
 	f.PathParams = pathParams
 	f.Headers = headers
-	return []byte("fake"), nil
+	return []byte("{}"), nil
 }
 
 type httpGetter struct {
