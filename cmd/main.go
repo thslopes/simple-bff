@@ -32,7 +32,7 @@ func main() {
 	app := fiber.New()
 
 	// Define a route for the GET method on the root path '/'
-	app.Get("/", func(c fiber.Ctx) error {
+	app.Get("/:query", func(c fiber.Ctx) error {
 		queryParams := map[string]string{}
 		c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
 			queryParams[string(k)] = string(v)
@@ -41,7 +41,7 @@ func main() {
 		c.Request().Header.VisitAll(func(k, v []byte) {
 			headers[string(k)] = string(v)
 		})
-		data, err := apicaller.Get("swapi-people", queryParams, headers)
+		data, err := apicaller.Get(c.Params("query"), queryParams, headers)
 
 		if err != nil {
 			return err
