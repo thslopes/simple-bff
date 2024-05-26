@@ -48,7 +48,7 @@ func main() {
 			return c.SendString("Error")
 		}
 
-		return c.SendString(string(data))
+		return c.JSON(data)
 	})
 
 	log.Fatal(app.Listen(":3000"))

@@ -1,10 +1,13 @@
 package apicall
 
+import "encoding/json"
+
 type Query struct {
 	Resource    string
 	QueryParams []Param
 	PathParams  []Param
 	Headers     []Param
+	Returns     []string
 }
 
 type Param struct {
@@ -17,7 +20,7 @@ type Caller struct {
 	Getter Getter
 }
 
-func (c *Caller) Get(query string, queryString, headers map[string]string) ([]byte, error) {
+func (c *Caller) Get(query string, queryString, headers map[string]string) (interface{}, error) {
 	apiCall := Queries[query]
 	url := Resources[apiCall.Resource]
 
@@ -36,7 +39,21 @@ func (c *Caller) Get(query string, queryString, headers map[string]string) ([]by
 		headersParams[v.Name] = getParamValue(v, queryString, headers)
 	}
 
-	return c.Getter.Get(url, queryParams, pathParams, headersParams)
+	body, err := c.Getter.Get(url, queryParams, pathParams, headersParams)
+	return parseResult(body, apiCall.Returns), err
+}
+
+func parseResult(data []byte, results []string) map[string]interface{} {
+	res := map[string]interface{}{}
+
+	var mapData map[string]interface{}
+	_ = json.Unmarshal(data, &mapData)
+
+	for _, v := range results {
+		res[v] = mapData[v]
+	}
+
+	return res
 }
 
 func getParamValue(v Param, queryString map[string]string, headers map[string]string) string {

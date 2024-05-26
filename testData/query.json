@@ -26,6 +26,7 @@
                 "type": "constant",
                 "value": "Bearer 1234"
             }
-        ]
+        ],
+        "returns":["name"]
     }
 }

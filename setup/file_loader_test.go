@@ -31,6 +31,7 @@ func TestLoadQueries(t *testing.T) {
 					Headers: []apicall.Param{
 						{Name: "Authorization", Value: "Bearer 1234", Type: "constant"},
 					},
+					Returns: []string{"name"},
 				},
 			},
 			wantErr: nil,

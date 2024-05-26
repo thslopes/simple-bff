@@ -8,7 +8,7 @@ import (
 
 func TestCaller_Get(t *testing.T) {
 	Resources = map[string]string{
-		"hello": "http://hello.com",
+		"hello":    "http://hello.com",
 		"wrongurl": "wrong.url",
 	}
 	Queries = map[string]Query{
@@ -93,11 +93,12 @@ func TestCaller_Get(t *testing.T) {
 		headers     map[string]string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FakeGetter
-		wantErr error
+		name       string
+		fields     fields
+		args       args
+		want       []byte
+		wantGetter *FakeGetter
+		wantErr    error
 	}{
 		{
 			name: "success",
@@ -107,7 +108,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				query: "success",
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{},
 				PathParams: map[string]string{},
@@ -125,7 +126,7 @@ func TestCaller_Get(t *testing.T) {
 					"value": "pathValue",
 				},
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{},
 				PathParams: map[string]string{"name1": "pathValue"},
@@ -143,7 +144,7 @@ func TestCaller_Get(t *testing.T) {
 					"value": "headerValue",
 				},
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{},
 				PathParams: map[string]string{},
@@ -158,7 +159,7 @@ func TestCaller_Get(t *testing.T) {
 			args: args{
 				query: "withConstantQs",
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{"name": "value"},
 				PathParams: map[string]string{},
@@ -176,7 +177,7 @@ func TestCaller_Get(t *testing.T) {
 					"qsKey": "qsValue",
 				},
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{"name": "qsValue"},
 				PathParams: map[string]string{},
@@ -194,7 +195,7 @@ func TestCaller_Get(t *testing.T) {
 					"headerKey": "headerValue",
 				},
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{"name": "headerValue"},
 				PathParams: map[string]string{},
@@ -212,7 +213,7 @@ func TestCaller_Get(t *testing.T) {
 					"qsKey": "qsValue",
 				},
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Url:        "http://hello.com",
 				Qs:         map[string]string{"name": "value", "name2": "qsValue"},
 				PathParams: map[string]string{},
@@ -232,7 +233,7 @@ func TestCaller_Get(t *testing.T) {
 			wantErr: &GetterErr{
 				Err: "wrong.url",
 			},
-			want: &FakeGetter{
+			wantGetter: &FakeGetter{
 				Error: true,
 			},
 		},
@@ -246,7 +247,41 @@ func TestCaller_Get(t *testing.T) {
 			if diff := cmp.Diff(tt.wantErr, err); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
-			if diff := cmp.Diff(tt.want, tt.fields.Getter); diff != "" {
+			if diff := cmp.Diff(tt.wantGetter, tt.fields.Getter); diff != "" {
+				t.Errorf("(-expected +actual):\n%s", diff)
+			}
+		})
+	}
+}
+
+func Test_parseResult(t *testing.T) {
+	type args struct {
+		data    []byte
+		results []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]interface{}
+	}{
+		{
+			name: "success",
+			args: args{
+				data: []byte("{\"key\": \"value\", \"key2\": \"value2\"}"),
+				results: []string{
+					"key",
+				},
+			},
+			want: map[string]interface{}{
+				"key": "value",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseResult(tt.args.data, tt.args.results)
+
+			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Errorf("(-expected +actual):\n%s", diff)
 			}
 		})
