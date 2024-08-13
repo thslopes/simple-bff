@@ -52,9 +52,11 @@ func handler(c fiber.Ctx) error {
 
 	body := c.Request().Body()
 	var bodyData interface{}
-	err := json.Unmarshal(body, &bodyData)
-	if err != nil {
-		return err
+	if len(body) > 0 {
+		err := json.Unmarshal(body, &bodyData)
+		if err != nil {
+			return err
+		}
 	}
 
 	data, err := apicaller.Do(c.Params("query"), queryParams, headers, bodyData)
